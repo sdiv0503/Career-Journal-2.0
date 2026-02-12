@@ -1,9 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   body {
+    /* We use apply here, or standard CSS properties */
     @apply antialiased bg-slate-50 text-slate-900;
   }
 }

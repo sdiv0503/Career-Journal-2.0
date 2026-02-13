@@ -6,8 +6,11 @@ import { ClerkProvider } from "@clerk/nextjs";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AI Career Journal",
-  description: "Track your coding journey and analyze your growth with AI.",
+  title: "Career Journal | AI Resume Coach",
+  description: "Track your career progress and get AI-powered resume feedback instantly.",
+  icons: {
+    icon: "/favicon.ico", // You can add a real favicon later
+  },
 };
 
 export default function RootLayout({

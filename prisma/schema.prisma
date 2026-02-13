@@ -45,6 +45,11 @@ model Resume {
   content   String   @db.Text // The extracted text
   fileName  String
   status    String   @default("analyzing")
+
+  // NEW: Store the AI result here. 
+  // We use String (serialized JSON) or Json type if your DB supports it.
+  // Neon/Postgres supports Json type perfectly.
+  analysis  Json?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

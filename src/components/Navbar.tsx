@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
-// Import Clerk components
+import { Sparkles, Trophy } from "lucide-react"; // Added Trophy icon
 import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
 export function Navbar() {
@@ -21,9 +20,15 @@ export function Navbar() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             {/* Show when Logged Out */}
             <SignedOut>
+              <Link href="/leaderboard">
+                <Button variant="ghost" className="hidden sm:flex items-center gap-2">
+                  <Trophy className="h-4 w-4 text-amber-500" />
+                  Leaderboard
+                </Button>
+              </Link>
               <Link href="/sign-in">
                 <Button variant="ghost">Sign In</Button>
               </Link>
@@ -34,10 +39,16 @@ export function Navbar() {
 
             {/* Show when Logged In */}
             <SignedIn>
+              <Link href="/leaderboard">
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <Trophy className="h-4 w-4 text-amber-500" />
+                  <span className="hidden sm:inline">Leaderboard</span>
+                </Button>
+              </Link>
               <Link href="/dashboard">
                 <Button variant="ghost" className="mr-2">Dashboard</Button>
               </Link>
-              <UserButton />
+              <UserButton afterSignOutUrl="/" />
             </SignedIn>
           </div>
         </div>

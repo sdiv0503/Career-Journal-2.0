@@ -5,38 +5,70 @@ export function useJournal() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load entries from LocalStorage on mount
+  // FETCH: Load entries from the API on mount
   useEffect(() => {
-    const saved = localStorage.getItem("journal_entries");
-    if (saved) {
-      try {
-        setEntries(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse journal entries", e);
-      }
+    const fetchEntries = async () => {
+  try {
+    const res = await fetch("/api/journal");
+    const json = await res.json(); // Parse JSON
+    
+    // Check if data exists, otherwise default to empty array
+    if (json.data) {
+      setEntries(json.data);
+    } else {
+      setEntries([]);
     }
+  } catch (error) {
+    console.error("Failed to fetch journal entries", error);
+  } finally {
     setIsLoading(false);
+  }
+};
+
+    fetchEntries();
   }, []);
 
-  // Save entries whenever they change
-  useEffect(() => {
-    if (!isLoading) {
-      localStorage.setItem("journal_entries", JSON.stringify(entries));
-    }
-  }, [entries, isLoading]);
+  // CREATE: Send new entry to the API
+  const addEntry = async (entry: Omit<JournalEntry, "id" | "createdAt" | "userId">) => {
+    try {
+      // Optimistic Update (Immediate UI feedback)
+      // We create a temporary ID to show it immediately while the server processes
+      const tempId = crypto.randomUUID();
+      const optimisticEntry = { ...entry, id: tempId, createdAt: Date.now() } as JournalEntry;
+      setEntries((prev) => [optimisticEntry, ...prev]);
 
-  const addEntry = (entry: Omit<JournalEntry, "id" | "createdAt">) => {
-    const newEntry: JournalEntry = {
-      ...entry,
-      id: crypto.randomUUID(), // Generates a unique ID
-      createdAt: Date.now(),
-    };
-    // Add to the TOP of the list (newest first)
-    setEntries((prev) => [newEntry, ...prev]);
+      // Real Server Call
+      const res = await fetch("/api/journal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(entry),
+      });
+      const json = await res.json();
+      const newEntry = json.data;
+
+      // Replace the temporary entry with the real one from DB
+      setEntries((prev) => 
+        prev.map((e) => (e.id === tempId ? newEntry : e))
+      );
+      
+    } catch (error) {
+      console.error("Failed to add entry", error);
+      // Rollback logic could go here
+    }
   };
 
-  const deleteEntry = (id: string) => {
-    setEntries((prev) => prev.filter((entry) => entry.id !== id));
+  // DELETE: Remove entry via API
+  const deleteEntry = async (id: string) => {
+    try {
+      // Optimistic Update
+      setEntries((prev) => prev.filter((entry) => entry.id !== id));
+
+      await fetch(`/api/journal/${id}`, {
+        method: "DELETE",
+      });
+    } catch (error) {
+      console.error("Failed to delete entry", error);
+    }
   };
 
   return {

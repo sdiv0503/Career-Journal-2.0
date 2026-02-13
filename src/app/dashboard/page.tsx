@@ -9,10 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2, Loader2, Calendar } from "lucide-react";
+import { ResumeUploader } from "@/components/ResumeUploader"; // Add this
 
 export default function Dashboard() {
   const { entries, addEntry, deleteEntry, isLoading } = useJournal();
-  
+
   // Local form state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -23,7 +24,7 @@ export default function Dashboard() {
     if (!title || !content) return;
 
     addEntry({ title, content, date });
-    
+
     // Reset form
     setTitle("");
     setContent("");
@@ -33,13 +34,15 @@ export default function Dashboard() {
     <div className="min-h-screen bg-slate-50">
       <Navbar />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <h1 className="text-3xl font-bold text-slate-900 mb-8">
-          My Career Journal
-        </h1>
+      <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+        <h1 className="mb-8 text-3xl font-bold text-slate-900">My Career Journal</h1>
+        {/* NEW: Resume Section */}
+        <section className="mb-12">
+          <h2 className="mb-4 text-xl font-semibold text-slate-800">AI Resume Analysis</h2>
+          <ResumeUploader />
+        </section>
 
         <div className="grid gap-8 md:grid-cols-[350px_1fr]">
-          
           {/* LEFT COLUMN: Entry Form */}
           <section>
             <Card className="sticky top-24">
@@ -51,7 +54,7 @@ export default function Dashboard() {
                   <div className="space-y-2">
                     <Label htmlFor="date">Date</Label>
                     <div className="relative">
-                      <Calendar className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
+                      <Calendar className="absolute top-3 left-3 h-4 w-4 text-slate-500" />
                       <Input
                         id="date"
                         type="date"
@@ -96,16 +99,14 @@ export default function Dashboard() {
 
           {/* RIGHT COLUMN: Entry List */}
           <section className="space-y-6">
-            <h2 className="text-xl font-semibold text-slate-800">
-              Recent Entries
-            </h2>
+            <h2 className="text-xl font-semibold text-slate-800">Recent Entries</h2>
 
             {isLoading ? (
               <div className="flex justify-center py-10">
                 <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
               </div>
             ) : entries.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-lg border border-dashed border-slate-300">
+              <div className="rounded-lg border border-dashed border-slate-300 bg-white py-12 text-center">
                 <p className="text-slate-500">No entries yet. Start writing!</p>
               </div>
             ) : (
@@ -116,7 +117,7 @@ export default function Dashboard() {
                       <CardTitle className="text-lg font-bold text-slate-900">
                         {entry.title}
                       </CardTitle>
-                      <p className="text-sm text-slate-500 mt-1">
+                      <p className="mt-1 text-sm text-slate-500">
                         {new Date(entry.date).toLocaleDateString(undefined, {
                           weekday: "long",
                           year: "numeric",
@@ -135,7 +136,7 @@ export default function Dashboard() {
                     </Button>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-slate-700 whitespace-pre-wrap leading-relaxed">
+                    <p className="leading-relaxed whitespace-pre-wrap text-slate-700">
                       {entry.content}
                     </p>
                   </CardContent>

@@ -48,8 +48,8 @@ export function EntryChart({ entries }: EntryChartProps) {
         <p className="text-sm text-slate-500">You have logged {totalEntries} entries in total.</p>
       </CardHeader>
       <CardContent>
-        {/* FIX: Add 'min-h-50' to ensure the parent always has height */}
-        <div className="h-50 min-h-50 w-full">
+        <div className="h-[200px] min-h-[200px] w-full">
+          {" "}
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>
               <XAxis

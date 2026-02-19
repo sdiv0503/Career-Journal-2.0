@@ -1,40 +1,90 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
-import { getUserByClerkID } from "@/lib/auth"; // Import our helper
+import { calculateNewStreak, calculateXPGain, calculateLevel } from "@/lib/gamification";
+import { checkBadges } from "@/lib/badges"; // Import the badge checker
+import { isToday } from "date-fns";
 
-export async function GET() {
+export async function POST(req: Request) {
   try {
-    // 1. Get the REAL user (creates them if they don't exist)
-    const user = await getUserByClerkID();
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const entries = await prisma.entry.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-    });
+    const { content } = await req.json();
 
-    return NextResponse.json({ data: entries });
-  } catch (error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-}
+    if (!content) {
+      return NextResponse.json({ error: "Content is required" }, { status: 400 });
+    }
 
-export async function POST(request: Request) {
-  try {
-    // 1. Get the REAL user
-    const user = await getUserByClerkID();
-    const json = await request.json();
+    // 1. Fetch User to get current stats
+    let user = await prisma.user.findUnique({ where: { id: userId } });
 
-    const entry = await prisma.entry.create({
-      data: {
-        title: json.title,
-        content: json.content,
-        date: new Date(json.date),
-        userId: user.id, // Link to the Clerk ID
+    // Fallback: Create user if missing
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          id: userId,
+          email: "user@example.com",
+          name: "User",
+          streak: 0,
+          xp: 0,
+          level: 1,
+        },
+      });
+    }
+
+    // 2. Calculate New Stats (Gamification Logic)
+    const newStreak = calculateNewStreak(user.streak, user.lastLogDate);
+    const isNewDay = !user.lastLogDate || !isToday(user.lastLogDate);
+    const xpGained = calculateXPGain(isNewDay);
+    const newXP = user.xp + xpGained;
+
+    // Check for Level Up!
+    const oldLevel = user.level;
+    const newLevel = calculateLevel(newXP);
+    const hasLeveledUp = newLevel > oldLevel;
+
+    // 3. Update Database (Transaction)
+    // Create Entry AND Update User Stats simultaneously
+    const [entry, updatedUser] = await prisma.$transaction([
+      prisma.entry.create({
+        data: {
+          userId,
+          content,
+          title: `Entry for ${new Date().toLocaleDateString()}`,
+          date: new Date(),
+          mood: "Neutral",
+        },
+      }),
+      prisma.user.update({
+        where: { id: userId },
+        data: {
+          streak: newStreak,
+          xp: newXP,
+          level: newLevel,
+          lastLogDate: new Date(),
+        },
+      }),
+    ]);
+
+    // 4. CHECK BADGES (New for Week 2 Day 4)
+    // We run this AFTER the transaction so the new entry counts towards the badge criteria
+    const newBadges = await checkBadges(userId, prisma);
+
+    return NextResponse.json({
+      data: entry,
+      gamification: {
+        streak: newStreak,
+        xpGained,
+        newLevel,
+        hasLeveledUp,
+        newBadges, // Send newly earned badges to the frontend
       },
     });
-
-    return NextResponse.json({ data: entry });
   } catch (error) {
-    return NextResponse.json({ error: "Error creating entry" }, { status: 500 });
+    console.error("Journal API Error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

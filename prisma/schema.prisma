@@ -9,16 +9,34 @@ datasource db {
 
 // MODEL 1: The User
 model User {
-  id        String   @id // Managed by Clerk
+  id        String   @id // Matches Clerk ID
   email     String   @unique
   name      String?
   imageUrl  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
+  // Gamification Fields (New for v2.0)
+  xp        Int      @default(0)
+  level     Int      @default(1)
+  streak    Int      @default(0)
+  lastLogDate DateTime? // To track daily streaks
+
   // Relations
   entries   Entry[]
-  resumes   Resume[] // <--- THIS LINE WAS MISSING OR INVALID
+  resumes   Resume[]
+  badges    Badge[]   // New Relation
+}
+
+model Badge {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  icon        String   // We will store the Lucide icon name here
+  awardedAt   DateTime @default(now())
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 // MODEL 2: The Journal Entry
@@ -40,22 +58,19 @@ model Entry {
 
 // MODEL 3: The Resume
 model Resume {
-  id        String   @id @default(uuid())
-  userId    String
-  content   String   @db.Text // The extracted text
-  fileName  String
-  status    String   @default("analyzing")
-
-  // NEW: Store the AI result here. 
-  // We use String (serialized JSON) or Json type if your DB supports it.
-  // Neon/Postgres supports Json type perfectly.
-  analysis  Json?
+  id             String   @id @default(uuid())
+  userId         String
+  content        String   @db.Text 
+  fileName       String
+  status         String   @default("analyzing")
   
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relation to User
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // NEW: Store the JD text used for comparison
+  jobDescription String?  @db.Text 
+  
+  analysis       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

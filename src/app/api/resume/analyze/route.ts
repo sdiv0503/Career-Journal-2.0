@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUserByClerkID } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { analyzeResumeWithAI } from "@/lib/ai"; // Import our mock service
+import { analyzeResume } from "@/lib/gemini"; // Import our mock service
 
 export async function POST(request: Request) {
   try {
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     // 3. Call the AI Service
     // Note: In a real production app, this might be a background job (Queue).
     // For this scale, awaiting it is fine (Next.js allows ~10-60s timeouts).
-    const analysisResult = await analyzeResumeWithAI(resume.content);
+    const analysisResult = await analyzeResume(resume.content);
 
     // 4. Save the Result
     const updatedResume = await prisma.resume.update({

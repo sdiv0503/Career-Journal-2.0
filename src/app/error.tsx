@@ -1,4 +1,4 @@
-"use client"; // Error components must be Client Components
+"use client";
 
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,40 +12,31 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("Global Error Caught:", error);
+    console.error(error);
   }, [error]);
 
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center bg-slate-50 text-center px-4">
-      <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 max-w-md">
-        <div className="flex justify-center mb-6">
-          <div className="p-4 bg-red-50 rounded-full">
+    <div className="flex h-screen w-full flex-col items-center justify-center bg-slate-50 px-4 text-center">
+      <div className="max-w-md rounded-2xl border border-slate-100 bg-white p-8 shadow-xl">
+        <div className="mb-6 flex justify-center">
+          <div className="rounded-full bg-red-50 p-4">
             <AlertTriangle className="h-10 w-10 text-red-500" />
           </div>
         </div>
-        
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">
-          Something went wrong!
-        </h2>
-        
-        <p className="text-slate-500 mb-6">
+
+        <h2 className="mb-2 text-2xl font-bold text-slate-900">Something went wrong!</h2>
+
+        <p className="mb-6 text-slate-500">
           We encountered an unexpected error. Our team has been notified.
         </p>
 
         <div className="space-y-4">
-          <Button 
-            onClick={() => reset()} 
-            className="w-full bg-slate-900 hover:bg-slate-800"
-          >
+          <Button onClick={() => reset()} className="w-full bg-slate-900 hover:bg-slate-800">
             Try Again
           </Button>
-          
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.href = "/dashboard"}
-            className="w-full"
-          >
-            Go to Dashboard
+
+          <Button variant="outline" onClick={() => (window.location.href = "/")} className="w-full">
+            Go Home
           </Button>
         </div>
       </div>

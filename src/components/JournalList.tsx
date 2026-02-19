@@ -34,8 +34,7 @@ export function JournalList({ initialEntries }: { initialEntries: Entry[] }) {
       <EmptyState
         title="Start Your Journey"
         description="Log your first entry to earn the 'First Step' badge."
-        icon={PenLine}
-        color="emerald"
+        icon={<PenLine className="w-8 h-8" />}
       />
     );
   }

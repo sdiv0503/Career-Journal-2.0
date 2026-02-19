@@ -1,4 +1,3 @@
-```markdown
 <div align="center">
   <img src="public/logo.png" alt="Career Journal Logo" width="100" />
   <h1>Career Journal v2.0 🚀</h1>

@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+```markdown
+<div align="center">
+  <img src="public/logo.png" alt="Career Journal Logo" width="100" />
+  <h1>Career Journal v2.0 🚀</h1>
+  <p>A gamified developer journal and AI-powered career growth platform.</p>
+  
+  [![Live Demo](https://img.shields.io/badge/Live_Demo-Online-success?style=for-the-badge)](https://careerjournal2.vercel.app/)
+</div>
 
-## Getting Started
+---
 
-First, run the development server:
+## 📌 Overview
+Career Journal is a split-architecture command center designed to help software engineers track their daily progress and optimize their job hunt. It bridges the gap between building skills and successfully marketing them to employers.
+
+The platform is divided into two core modules:
+* **The Gym (Journal):** A daily habit tracker for coding wins, bugs, and learnings. Features a gamified progression system with XP, streaks, and unlockable badges.
+* **The Lab (Analyzer):** An AI-driven career suite. Upload your tech resume to get instant ATS scoring, gap analysis against target Job Descriptions, AI Mock Interviews, and generated 6-month learning roadmaps.
+
+## ✨ Key Features
+* **Gamification Engine:** Track daily streaks, earn XP, and unlock achievements showcased in a sleek "Trophy Room" dashboard.
+* **AI Resume Analysis:** Strict, objective ATS scoring and structural feedback powered by Gemini 2.5 Flash.
+* **Job Description Matcher:** Cross-references your resume against specific JDs to highlight missing keywords and critical gaps.
+* **Interactive Mock Interviews:** Real-time, streaming AI chat interface acting as a Hiring Manager based on your uploaded resume context.
+* **Career Roadmap Generator:** Builds a customized, month-by-month technical curriculum to reach your target role.
+* **Guided Onboarding:** Interactive product tour for new users utilizing `driver.js`.
+
+## 🛠️ Tech Stack
+* **Framework:** Next.js 15 (App Router, Turbopack)
+* **Language:** TypeScript
+* **Styling & Animations:** Tailwind CSS, Framer Motion
+* **Authentication:** Clerk (with GitHub OAuth)
+* **Database & ORM:** PostgreSQL (Neon/Supabase) & Prisma
+* **AI Integration:** Google Generative AI SDK (Gemini 2.5 Flash)
+
+## 🚀 Getting Started
+
+### Prerequisites
+Make sure you have Node.js (v18+) and npm installed. You will also need a PostgreSQL database and a Clerk account.
+
+### 1. Clone the repository
+```bash
+git clone [https://github.com/sdiv0503/career-journal.git](https://github.com/sdiv0503/career-journal.git)
+cd career-journal
+
+```
+
+### 2. Install dependencies
+
+```bash
+npm install --legacy-peer-deps
+
+```
+
+### 3. Set up Environment Variables
+
+Create a `.env` file in the root directory and add the following keys:
+
+```env
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
+
+DATABASE_URL=your_postgresql_connection_string
+
+GOOGLE_API_KEY=your_gemini_api_key
+
+```
+
+### 4. Database Initialization
+
+Push the Prisma schema to your database to create the necessary tables:
+
+```bash
+npx prisma generate
+npx prisma db push
+
+```
+
+### 5. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000) in your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**Built by [Divyansh Sharma**](https://www.google.com/search?q=https://github.com/sdiv0503)
 
-## Learn More
+```
 
-To learn more about Next.js, take a look at the following resources:
+**Next Steps:**
+1. Update the `[https://your-vercel-deployment-url.vercel.app]` link at the top to your actual Vercel URL.
+2. Commit and push this file:
+   ```bash
+   git add README.md
+   git commit -m "docs: add minimal and useful readme"
+   git push origin main
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```

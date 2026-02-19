@@ -5,7 +5,7 @@ import { matchResumeToJD } from "@/lib/gemini";
 
 export async function POST(
   req: Request, 
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId } = await auth();

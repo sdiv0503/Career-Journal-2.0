@@ -37,7 +37,7 @@ Make sure you have Node.js (v18+) and npm installed. You will also need a Postgr
 
 ### 1. Clone the repository
 ```bash
-git clone [https://github.com/sdiv0503/career-journal.git](https://github.com/sdiv0503/career-journal.git)
+git clone [https://github.com/sdiv0503/career-journal-2.0.git](https://github.com/sdiv0503/career-journal-2.0.git)
 cd career-journal
 
 ```

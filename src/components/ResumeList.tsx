@@ -28,8 +28,7 @@ export function ResumeList({ initialResumes = [] }: ResumeListProps) {
       <EmptyState
         title="No Resumes Yet"
         description="Upload your resume to get an AI-powered analysis and score."
-        icon={UploadCloud}
-        color="blue"
+        icon={<UploadCloud className="w-8 h-8" />}
       />
     );
   }

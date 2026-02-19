@@ -87,16 +87,4 @@ Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:30
 
 ---
 
-**Built by [Divyansh Sharma**](https://www.google.com/search?q=https://github.com/sdiv0503)
-
-```
-
-**Next Steps:**
-1. Update the `[https://your-vercel-deployment-url.vercel.app]` link at the top to your actual Vercel URL.
-2. Commit and push this file:
-   ```bash
-   git add README.md
-   git commit -m "docs: add minimal and useful readme"
-   git push origin main
-
-```
+Built by [Divyansh Sharma](https://www.google.com/search?q=https://github.com/sdiv0503)

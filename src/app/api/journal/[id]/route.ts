@@ -4,14 +4,15 @@ import prisma from "@/lib/prisma";
 
 // PATCH: Update an entry
 export async function PATCH(
-  req: Request, 
-  { params }: { params: { id: string } }
+  req: Request,
+  { params }: { params: Promise<{ id: string }> } // FIX: Typed as a Promise
 ) {
   try {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { content } = await req.json();
+
     // Await params in Next.js 15+
     const { id } = await params;
 
@@ -37,8 +38,8 @@ export async function PATCH(
 
 // DELETE: Remove an entry
 export async function DELETE(
-  req: Request, 
-  { params }: { params: { id: string } }
+  req: Request,
+  { params }: { params: Promise<{ id: string }> } // FIX: Typed as a Promise
 ) {
   try {
     const { userId } = await auth();

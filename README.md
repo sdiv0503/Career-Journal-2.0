@@ -21,7 +21,6 @@ The platform is divided into two core modules:
 * **Job Description Matcher:** Cross-references your resume against specific JDs to highlight missing keywords and critical gaps.
 * **Interactive Mock Interviews:** Real-time, streaming AI chat interface acting as a Hiring Manager based on your uploaded resume context.
 * **Career Roadmap Generator:** Builds a customized, month-by-month technical curriculum to reach your target role.
-* **Guided Onboarding:** Interactive product tour for new users utilizing `driver.js`.
 
 ## 🛠️ Tech Stack
 * **Framework:** Next.js 15 (App Router, Turbopack)

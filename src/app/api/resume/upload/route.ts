@@ -1,15 +1,35 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { parsePdf } from "@/lib/pdf-loader"; 
 import { analyzeResume } from "@/lib/gemini"; 
-import { calculateLevel } from "@/lib/gamification"; // Import
-import { checkBadges } from "@/lib/badges"; // Import
+import { calculateLevel } from "@/lib/gamification";
+import { checkBadges } from "@/lib/badges";
 
 export async function POST(req: Request) {
   try {
     const { userId } = await auth();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // 1. Ensure the user exists in the DB before attaching a resume
+    let user = await prisma.user.findUnique({ where: { id: userId } });
+    
+    if (!user) {
+      const clerkUser = await currentUser();
+      const email = clerkUser?.emailAddresses[0]?.emailAddress || `${userId}@placeholder.com`;
+      const name = clerkUser?.firstName || "User";
+
+      user = await prisma.user.create({
+        data: {
+          id: userId,
+          email: email,
+          name: name,
+          streak: 0,
+          xp: 0,
+          level: 1,
+        },
+      });
+    }
 
     const formData = await req.formData();
     const file = formData.get("file") as File;
@@ -21,7 +41,7 @@ export async function POST(req: Request) {
 
     if (text.length < 50) return NextResponse.json({ error: "PDF empty." }, { status: 400 });
 
-    // 1. Create Initial Record
+    // 2. Create Initial Resume Record attached to User
     const resume = await prisma.resume.create({
       data: {
         userId,
@@ -32,34 +52,29 @@ export async function POST(req: Request) {
       },
     });
 
-    // 2. Run AI
+    // 3. Run AI
     const aiResult = await analyzeResume(text);
 
-    // 3. GAMIFICATION TRIGGER
-    // Fetch user to get current XP
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    
+    // 4. GAMIFICATION TRIGGER
     let xpGained = 0;
-    let newLevel = user?.level || 1;
+    let newLevel = user.level || 1;
     let hasLeveledUp = false;
 
-    if (user) {
-      xpGained = 50; // Big reward for analysis
-      const newXP = user.xp + xpGained;
-      newLevel = calculateLevel(newXP);
-      hasLeveledUp = newLevel > user.level;
+    xpGained = 50; // Big reward for analysis
+    const newXP = user.xp + xpGained;
+    newLevel = calculateLevel(newXP);
+    hasLeveledUp = newLevel > user.level;
 
-      // Update User Stats
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
-          xp: newXP,
-          level: newLevel
-        }
-      });
-    }
+    // Update User Stats
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        xp: newXP,
+        level: newLevel
+      }
+    });
 
-    // 4. Update Resume Record
+    // 5. Update Resume Record
     const updatedResume = await prisma.resume.update({
       where: { id: resume.id },
       data: {
@@ -68,7 +83,7 @@ export async function POST(req: Request) {
       }
     });
 
-    // 5. Check Badges (Now that resume is saved with score)
+    // 6. Check Badges
     const newBadges = await checkBadges(userId, prisma);
 
     return NextResponse.json({ 

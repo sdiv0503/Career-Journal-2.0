@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { calculateNewStreak, calculateXPGain, calculateLevel } from "@/lib/gamification";
-import { checkBadges } from "@/lib/badges"; // Import the badge checker
+import { checkBadges } from "@/lib/badges";
 import { isToday } from "date-fns";
 
 export async function POST(req: Request) {
@@ -21,13 +21,17 @@ export async function POST(req: Request) {
     // 1. Fetch User to get current stats
     let user = await prisma.user.findUnique({ where: { id: userId } });
 
-    // Fallback: Create user if missing
+    // Fallback: Create user dynamically if missing
     if (!user) {
+      const clerkUser = await currentUser();
+      const email = clerkUser?.emailAddresses[0]?.emailAddress || `${userId}@placeholder.com`;
+      const name = clerkUser?.firstName || "User";
+
       user = await prisma.user.create({
         data: {
           id: userId,
-          email: "user@example.com",
-          name: "User",
+          email: email,
+          name: name,
           streak: 0,
           xp: 0,
           level: 1,
@@ -69,7 +73,7 @@ export async function POST(req: Request) {
       }),
     ]);
 
-    // 4. CHECK BADGES (New for Week 2 Day 4)
+    // 4. CHECK BADGES
     // We run this AFTER the transaction so the new entry counts towards the badge criteria
     const newBadges = await checkBadges(userId, prisma);
 
